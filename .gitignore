@@ -1,0 +1,7 @@
+target/
+*.log
+*.out
+*.tmp
+
+# Optional local artifacts for engine runs
+solution/

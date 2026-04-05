@@ -1,0 +1,12 @@
+[package]
+name = "filler"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "filler"
+path = "src/lib.rs"
+
+[[bin]]
+name = "filler"
+path = "src/main.rs"
