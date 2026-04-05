@@ -130,3 +130,47 @@ Status: NOT EXECUTED
   - Engine: `./linux_game_engine`
   - Robots: `linux_robots/*`
   - Player: `/filler/solution/target/release/filler`
+
+## Reproduction Commands
+
+Use these commands if you want to reproduce the audit exactly.
+
+### Host setup
+
+1. `cd /mnt/c/Users/xs7ar/Downloads/filler/docker_image`
+2. `mkdir -p solution/bin solution/scripts`
+3. `cp /mnt/c/Projects/filler/scripts/audit_runner.sh solution/scripts/audit_runner.sh`
+4. `docker build -t filler .`
+5. `docker run -v "$(pwd)/solution":/filler/solution -it filler`
+
+### Inside the container
+
+6. `cd /filler/solution`
+7. `rm -f Cargo.lock`
+8. `cargo build --release`
+9. `cd /filler`
+10. `./linux_game_engine -f maps/map00 -p1 /filler/solution/target/release/filler -p2 linux_robots/wall_e`
+
+### Required match matrix
+
+11. `./linux_game_engine -q -f maps/map00 -p1 /filler/solution/target/release/filler -p2 linux_robots/wall_e`
+12. `./linux_game_engine -q -f maps/map00 -p1 linux_robots/wall_e -p2 /filler/solution/target/release/filler`
+13. `./linux_game_engine -q -f maps/map00 -p1 /filler/solution/target/release/filler -p2 linux_robots/wall_e`
+14. `./linux_game_engine -q -f maps/map00 -p1 linux_robots/wall_e -p2 /filler/solution/target/release/filler`
+15. `./linux_game_engine -q -f maps/map00 -p1 /filler/solution/target/release/filler -p2 linux_robots/wall_e`
+
+16. `./linux_game_engine -q -f maps/map01 -p1 /filler/solution/target/release/filler -p2 linux_robots/h2_d2`
+17. `./linux_game_engine -q -f maps/map01 -p1 linux_robots/h2_d2 -p2 /filler/solution/target/release/filler`
+18. `./linux_game_engine -q -f maps/map01 -p1 /filler/solution/target/release/filler -p2 linux_robots/h2_d2`
+19. `./linux_game_engine -q -f maps/map01 -p1 linux_robots/h2_d2 -p2 /filler/solution/target/release/filler`
+20. `./linux_game_engine -q -f maps/map01 -p1 /filler/solution/target/release/filler -p2 linux_robots/h2_d2`
+
+21. `./linux_game_engine -q -f maps/map02 -p1 /filler/solution/target/release/filler -p2 linux_robots/bender`
+22. `./linux_game_engine -q -f maps/map02 -p1 linux_robots/bender -p2 /filler/solution/target/release/filler`
+23. `./linux_game_engine -q -f maps/map02 -p1 /filler/solution/target/release/filler -p2 linux_robots/bender`
+24. `./linux_game_engine -q -f maps/map02 -p1 linux_robots/bender -p2 /filler/solution/target/release/filler`
+25. `./linux_game_engine -q -f maps/map02 -p1 /filler/solution/target/release/filler -p2 linux_robots/bender`
+
+### Unit tests
+
+26. `cargo test`

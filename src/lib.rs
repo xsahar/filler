@@ -1,3 +1,4 @@
+//crate module registry
 pub mod app;
 pub mod board;
 pub mod model;

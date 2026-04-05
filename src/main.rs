@@ -1,3 +1,4 @@
+//entrypoint used by the game engine.
 use std::io::{self, BufReader, BufWriter, Write};
 
 fn main() {

@@ -11,6 +11,9 @@ This folder breaks the Rust implementation into small steps.
 5. `05-audit-readiness.md`
 6. `06-docker-and-audit-commands.md`
 7. `07-audit-results.md`
+8. `08-host-setup.md`
+9. `09-reproduction-commands.md`
+10. `10-audit-command-matrix.md`
 
 ## Goal
 
