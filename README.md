@@ -1,139 +1,155 @@
-## Filler
+The Game:
 
-This project is a command-line robot for the Filler game engine.
-The engine sends board + piece on stdin, and your bot must print coordinates on stdout.
+What is filler?
 
-## What You Must Implement
+Filler is an algorithmic game which consists in filling a grid of a known size in advance with pieces of a random size and shape, provided by the game_engine. In this game, two robots fight against each other, one after the other on the Anfield.
 
-1. Parse every turn input correctly.
-2. Validate placements with these rules:
-- Exactly one overlap with your own territory.
-- Zero overlap with opponent territory.
-- Piece must stay inside board bounds.
-3. Output one move in this exact format:
-- X Y
-4. Keep responding every turn, even when no valid move exists.
+Each player will receive a game piece to place on the Anfield with exactly one cell of overlapping with its previous territory (meaning the region you've already placed your pieces on the Anfield). The shape of robots territory must not exceed the area of the Anfield. You cannot overlap your opponent pieces, neither him can overlap yours.
 
-## Run The Project (Original Recipe)
+If one player cannot place any piece on the Anfield, he stops there while the other player can keep on placing pieces in order to achieve the maximum score possible, each piece that the player can put correctly on the Anfield will give him more points. The player who occupy the biggest surface on the Anfield wins.
 
-1. Download and extract the official package from:
-- https://assets.01-edu.org/filler/filler.zip
-2. Enter the package engine folder (for your package this is docker_image).
-3. Build the image:
+The Anfield:
 
-```bash
-docker build -t filler .
-```
+The Anfield is a two-dimensional grid with an arbitrary number of rows and columns where the robots will fight. To launch the game, we will provide you with some initial Anfield that must be passed as an argument to the game_engine. If you want you can create your own Anfield, remember it must have the starting position for each of the robots.
 
-4. Run container with mounted solution folder:
+Here is an example of an initial Anfield of 30 by 14 :
 
-```bash
-docker run -v "$(pwd)/solution":/filler/solution -it filler
-```
+..............................
+..............................
+..$...........................
+..............................
+..............................
+..............................
+..............................
+..............................
+..............................
+..............................
+..............................
+...........................@..
+..............................
+..............................
 
-5. Build player in container and run matches with engine commands.
+The pieces
 
-Note: some packages use game_engine/robots, others use linux_game_engine/linux_robots.
+The pieces are managed randomly by the game_engine. You can’t predict their size or shape until the game_engine transmits them to your program. Here are some examples of possible pieces to give you an idea:
 
-## Required Audit Checks
+Piece 2 2:
+.#
+#.
 
-1. Container/image creation works.
-2. Player runs without runtime failure.
-3. Placement logic is correct.
-4. Win rate at least 4/5 for:
-- map00 vs wall_e
-- map01 vs h2_d2
-- map02 vs bender
-5. Unit tests pass for:
-- parsing
-- placement validation
-- boundaries
-- output format
+Piece 5 4:
+.##..
+.##..
+..#..
+...#.
 
-## Tests
+Piece 6 3:
+.##...
+###...
+#..#..
+The Robots
 
-Run:
+The principle is simple, two robots compete on the Anfield, and they must place, in turns, the piece that the game_engine randomly gives them, earning points each time they place a piece correctly. The game ends when none of the two players can place a piece or if one of the two players return an unexpected error (timeout, segfault, memory issues and so on). If only one player can't place a piece or place it in an incorrect way his move is ignored but the game continue for the other player.
 
-```bash
-cargo test
-```
+Your goal is to win against all our robots, except the terminator. You'll have to know the following:
 
-## Documentation For Auditors
+The game_engine will run your program and write the Anfield and the piece to place in the standard input.
 
-- [docs/README.md](docs/README.md): full documentation index.
-- [docs/08-host-setup.md](docs/08-host-setup.md): machine prerequisites and folder setup.
-- [docs/09-reproduction-commands.md](docs/09-reproduction-commands.md): exact reproduction commands.
-- [docs/10-audit-command-matrix.md](docs/10-audit-command-matrix.md): all required audit match commands.
-- [docs/07-audit-results.md](docs/07-audit-results.md): recorded pass/fail outcomes.
+Each turn, the game_engine rewrites the Anfield and includes a new random piece to be placed.
 
-Quick auditor path:
-1. [docs/08-host-setup.md](docs/08-host-setup.md)
-2. [docs/09-reproduction-commands.md](docs/09-reproduction-commands.md)
-3. [docs/10-audit-command-matrix.md](docs/10-audit-command-matrix.md)
-4. compare with [docs/07-audit-results.md](docs/07-audit-results.md)
+The first line the game_engine will send to the robot is it's player number in the following format $$$ exec p<number> : [<player path>]
 
-## Auditor Checklist (Fast Version)
+In order to place the game piece on the Anfield, the player will have to write it’s coordinates on the standard output.
 
-Use this quick list if you need a pass or fail decision fast:
+The following format must be used X Y\n.
 
-1. Confirm Docker is available on host machine.
-2. Confirm the official engine package is extracted and includes maps and robots.
-3. Build container image successfully.
-4. Start container successfully with mounted solution folder.
-5. Build student player inside container.
-6. Run one non-quiet match to verify no runtime crash.
-7. Run all required quiet match matrix commands.
-8. Verify each required map set reaches at least 4 wins out of 5.
-9. Run tests and confirm full pass.
-10. Compare results with [docs/07-audit-results.md](docs/07-audit-results.md).
+To be able to place a piece on the Anfield, it is mandatory that one, and only one cell of the shape (in your piece) covers the cell of a shape placed previously (your territory).
 
-## Pass Criteria Interpretation
+You will collect points each time you place a piece.
 
-This section clarifies how to interpret the audit rules:
+If you are the Player 1 your program will be represented by a and @. If you are Player 2, your program will be represented by s and $.
 
-1. Container setup is PASS if image build and interactive container start both succeed.
-2. Runtime behavior is PASS if player does not exit early and engine does not report EOF or broken pipe for valid runs.
-3. Placement correctness is PASS if runtime matches proceed normally and placement tests pass.
-4. Win-rate rule is PASS per map when wins are greater than or equal to 4 in 5 runs.
-5. Unit test section is PASS when parser, placement, boundary, and output format tests all pass.
+The lowercases (s or a) will highlight the piece last placed on the Anfield. At the following turns, that same piece will be represented by the symbols ($ or @), as it won’t be the piece last placed anymore.
 
-## Evidence To Keep For Review
+If the solution is wrong the game_engine won't make the robot play anymore but the game continues for the other player.
 
-To make review easy, keep these outputs:
+If there is a timeout or any other kind of unexpected error from the player the game stops and the player loses.
 
-1. Output of container build command.
-2. Output of first full non-quiet match.
-3. Output summaries for all 15 required quiet runs.
-4. Output of test command.
-5. Final result summary copied into [docs/07-audit-results.md](docs/07-audit-results.md).
+If your robot can't place anymore peaces he should still return a result (even if invalid), our robots for example return 0 0\n, when they can't place any more pieces.
 
-## Engine Naming Variants
+The Game_engine
 
-Official packages can differ by naming:
+The game_engine will be provided to you and it will run in a docker container.
 
-1. Variant A uses game_engine and robots.
-2. Variant B uses linux_game_engine and linux_robots.
+Here are the flags that can be used:
 
-This repository was verified with the linux naming variant.
-If your package uses the other variant, use equivalent commands with those names.
+  -f, -file string
+       Path to map
+  -p1, -player1 string
+       Path to AI one
+  -p2, -player2 string
+       Path to AI two
+  -q, -quiet
+       Quiet mode
+  -r, -refresh
+       Throttling mode
+  -s, -seed int
+       Use a random seed number
+  -t, -time int
+       Set timeout in seconds (default 10)
+Docker
 
-## Common Issues And Fixes
+For the filler project you must use Docker. You can read about docker basics in the ascii-art-web-dockerize subject.
 
-1. Docker command not found on WSL:
-- install and start Docker Desktop, then enable WSL integration.
+Follow this instructions to get the game running:
 
-2. Docker permission denied on socket:
-- add user to docker group, reopen shell, verify with docker info.
+The docker_image folder will be provided to you as a zip file, you can download it here.
 
-3. Player exits with EOF at runtime:
-- build the player inside the same container used by the engine.
+Inside the folder you will find the Dockerfile, the game_engine, the maps and the robots.
 
-4. Cargo lock format mismatch in container:
-- remove Cargo.lock in container and regenerate by running cargo build there.
+In order to set everything up you will need to follow these steps:
 
-## Final Notes For Auditors
+Go inside the folder and build the image docker build -t filler .
+Run the container docker run -v "$(pwd)/solution":/filler/solution -it filler. This instruction will open a terminal in the container, the directory solution will be mounted in the container as well.
+Your solution should be inside the solution directory so it will be mounted inside the container.
+You can code your solution from the host machine with your favorite editor but don't forget to compile it and run it from the container terminal.
+Example of how you can run the game inside the container:
 
-1. This README is intentionally short and review-focused.
-2. The full implementation details remain in docs and source modules.
-3. For reproducibility, always follow the command order in [docs/09-reproduction-commands.md](docs/09-reproduction-commands.md).
-4. For scoring decisions, use only the required matrix in [docs/10-audit-command-matrix.md](docs/10-audit-command-matrix.md).
+./game_engine -f maps/map01 -p1 robots/bender -p2 robots/terminator
+
+Usage
+
+Here is an example of the first input that the game_engine will send to player 1:
+
+$$$ exec p1 : [robots/bender]
+Anfield 20 15:
+    01234567890123456789
+000 ....................
+001 ....................
+002 .........@..........
+003 ....................
+004 ....................
+005 ....................
+006 ....................
+007 ....................
+008 ....................
+009 ....................
+010 ....................
+011 ....................
+012 .........$..........
+013 ....................
+014 ....................
+Piece 4 1:
+.OO.
+And his response:
+
+7 2\n
+Unit Tests
+
+You must implement unit tests within your filler project to ensure your robot's parsing logic and placement strategy are reliable. Specifically, your tests should:
+
+Verify Input Parsing by ensuring the Anfield grid and the incoming pieces are correctly converted into internal data structures from the standard input string.
+Verify Valid Placement Logic by testing that a potential coordinate correctly identifies if it has exactly one overlapping cell with existing territory and zero overlaps with the opponent.
+Test Boundary Conditions to ensure the robot never attempts to place a piece that extends beyond the rows or columns of the Anfield.
+Verify Coordinate Output by ensuring the final calculation is formatted exactly as X Y\n as required by the game_engine.
+

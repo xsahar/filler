@@ -1,6 +1,6 @@
 # Filler Docs
 
-This folder breaks the Rust implementation into small steps.
+This folder is simplified to one run guide plus reference docs.
 
 ## Read in this order
 
@@ -9,11 +9,7 @@ This folder breaks the Rust implementation into small steps.
 3. `03-step-by-step-plan.md`
 4. `04-testing-plan.md`
 5. `05-audit-readiness.md`
-6. `06-docker-and-audit-commands.md`
-7. `07-audit-results.md`
-8. `08-host-setup.md`
-9. `09-reproduction-commands.md`
-10. `10-audit-command-matrix.md`
+6. `07-audit-results.md`
 
 ## Goal
 
@@ -28,3 +24,7 @@ Build a reliable Rust CLI robot for the Filler game engine that:
 
 - Build: `cargo build`
 - Test: `cargo test`
+
+## Important
+
+Use only `03-step-by-step-plan.md` for setup and run commands.
