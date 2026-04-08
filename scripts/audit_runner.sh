@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Run this inside the provided filler container where game_engine, maps, and robots exist.
+# Run this inside the provided filler container where maps and robots exist.
+# Supports both naming variants:
+# - game_engine + robots
+# - linux_game_engine + linux_robots
 # Example:
 #   ./scripts/audit_runner.sh /filler/solution/bin/filler
 
@@ -11,10 +14,17 @@ if [[ $# -lt 1 ]]; then
 fi
 
 PLAYER_PATH="$1"
-ENGINE="./game_engine"
+ENGINE=""
+ROBOT_DIR=""
 
-if [[ ! -x "${ENGINE}" ]]; then
-  echo "[error] ${ENGINE} not found or not executable. Run this script in the engine directory."
+if [[ -x "./game_engine" ]]; then
+  ENGINE="./game_engine"
+  ROBOT_DIR="robots"
+elif [[ -x "./linux_game_engine" ]]; then
+  ENGINE="./linux_game_engine"
+  ROBOT_DIR="linux_robots"
+else
+  echo "[error] No supported engine found. Expected ./game_engine or ./linux_game_engine"
   exit 1
 fi
 
@@ -23,8 +33,8 @@ if [[ ! -x "${PLAYER_PATH}" ]]; then
   exit 1
 fi
 
-if [[ ! -d "maps" ]] || [[ ! -d "robots" ]]; then
-  echo "[error] maps/ or robots/ not found in current directory."
+if [[ ! -d "maps" ]] || [[ ! -d "${ROBOT_DIR}" ]]; then
+  echo "[error] maps/ or ${ROBOT_DIR}/ not found in current directory."
   exit 1
 fi
 
@@ -82,10 +92,10 @@ run_series() {
 
     if (( i % 2 == 1 )); then
       p1="${PLAYER_PATH}"
-      p2="robots/${enemy}"
+      p2="${ROBOT_DIR}/${enemy}"
       student_side="p1"
     else
-      p1="robots/${enemy}"
+      p1="${ROBOT_DIR}/${enemy}"
       p2="${PLAYER_PATH}"
       student_side="p2"
     fi
