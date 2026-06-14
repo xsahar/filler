@@ -139,7 +139,7 @@ Use these commands if you want to reproduce the audit exactly.
 
 1. `cd /mnt/c/Users/xs7ar/Downloads/filler/docker_image`
 2. `mkdir -p solution/bin solution/scripts`
-3. `cp /mnt/c/Projects/filler/scripts/audit_runner.sh solution/scripts/audit_runner.sh`
+3. Use the audit runner from this repository if you want to automate the match matrix.
 4. `docker build -t filler .`
 5. `docker run -v "$(pwd)/solution":/filler/solution -it filler`
 

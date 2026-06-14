@@ -4,8 +4,11 @@ Use this as the only run guide.
 
 ## 1. Open project in WSL
 
+Use a WSL shell or another terminal where Docker Desktop is available on `PATH`. Do not use MSYS/Git Bash for these commands.
+If Docker Desktop says you have no WSL 2 distros installed, install or convert a WSL 2 distro first, then enable WSL integration for that distro.
+
 ```bash
-cd /mnt/c/Projects/filler
+cd /mnt/c/Users/Sahar/filler
 ```
 
 ## 2. Check that engine files exist in this project
@@ -22,6 +25,8 @@ You should see `linux_game_engine`, `linux_robots`, `maps`, and map files `map00
 ```bash
 docker build -t filler-local ./engine_files
 ```
+
+If `docker` is not found here, stop and reopen this repo from WSL after Docker Desktop integration is enabled.
 
 ## 4. Build your player inside the container
 

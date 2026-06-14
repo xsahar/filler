@@ -14,26 +14,54 @@ The engine sends board + piece on stdin, and your bot must print coordinates on 
 - X Y
 4. Keep responding every turn, even when no valid move exists.
 
-## Run The Project (Original Recipe)
+## Run The Project
 
-1. Download and extract the official package from:
-- https://assets.01-edu.org/filler/filler.zip
-2. Enter the package engine folder (for your package this is docker_image).
-3. Build the image:
+Use WSL with Docker Desktop integration enabled. This repository is verified with the Linux engine layout.
 
-```bash
-docker build -t filler .
-```
-
-4. Run container with mounted solution folder:
+1. Open a WSL shell and change into the repo:
 
 ```bash
-docker run -v "$(pwd)/solution":/filler/solution -it filler
+cd /mnt/c/Users/Sahar/filler
 ```
 
-5. Build player in container and run matches with engine commands.
+2. Build the engine image from the bundled `engine_files` folder:
 
-Note: some packages use game_engine/robots, others use linux_game_engine/linux_robots.
+```bash
+docker build -t filler-local ./engine_files
+```
+
+3. Build the player binary inside Docker:
+
+```bash
+docker run --rm --entrypoint /bin/bash -v "$(pwd)":/filler/solution filler-local -lc '
+set -e
+export PATH="/usr/local/cargo/bin:$PATH"
+cd /filler/solution
+rm -f Cargo.lock
+cargo build --release
+'
+```
+
+4. Start the engine container with the repo mounted as `/filler/solution`:
+
+```bash
+docker run --rm -it -v "$(pwd)":/filler/solution filler-local
+```
+
+5. Inside the container, run the audit helper against the built player:
+
+```bash
+cd /filler
+bash /filler/solution/scripts/audit_runner.sh /filler/solution/target/release/filler
+```
+
+If you need a manual smoke test, run one match directly:
+
+```bash
+./linux_game_engine -q -f maps/map00 -p1 /filler/solution/target/release/filler -p2 linux_robots/wall_e
+```
+
+Note: some official packages use `game_engine`/`robots`, while this repository uses `linux_game_engine`/`linux_robots`.
 
 ## Required Audit Checks
 
@@ -120,6 +148,7 @@ If your package uses the other variant, use equivalent commands with those names
 
 1. Docker command not found on WSL:
 - install and start Docker Desktop, then enable WSL integration.
+- if you are in MSYS/Git Bash, switch to WSL or another terminal where `docker` is on `PATH`.
 
 2. Docker permission denied on socket:
 - add user to docker group, reopen shell, verify with docker info.

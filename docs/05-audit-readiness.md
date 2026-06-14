@@ -7,13 +7,13 @@ This file maps the project to the audit checklist in Audit.md.
 1. Container and engine launch
 - Run inside the provided filler docker container.
 - Sanity command:
-  - ./game_engine -f maps/map01 -p1 robots/bender -p2 robots/terminator
+  - ./linux_game_engine -f maps/map01 -p1 linux_robots/bender -p2 linux_robots/terminator
 
 2. Student player execution
 - Build player binary:
   - cargo build --release
 - Example run versus a robot:
-  - ./game_engine -f maps/map00 -p1 solution/target/release/filler -p2 robots/wall_e
+  - ./linux_game_engine -f maps/map00 -p1 /filler/solution/target/release/filler -p2 linux_robots/wall_e
 
 3. Placement correctness
 - Core rule enforcement is in src/board/mod.rs.
@@ -37,4 +37,4 @@ This file maps the project to the audit checklist in Audit.md.
 
 ## Known gap for full audit confirmation
 
-Win-rate and container checks cannot be confirmed until the official game_engine, maps, and robots are run in docker.
+Win-rate and container checks cannot be confirmed until the official linux_game_engine, maps, and linux_robots are run in docker.
